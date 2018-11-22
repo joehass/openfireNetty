@@ -8,6 +8,6 @@ public interface Module {
      */
     String getName();
 
-    void initialize(XMPPSer)
+    void initialize(XMPPServer);
 
 }
