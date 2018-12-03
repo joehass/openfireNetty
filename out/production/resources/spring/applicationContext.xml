@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context.xsd
+	http://www.springframework.org/schema/mvc
+	http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd">
+
+    <import resource="applicationContext-dao.xml"/>
+    <!--<import resource="applicationContext-transaction.xml.bak"/>-->
+    <import resource="spring-redis.xml"/>
+    <context:component-scan base-package="Test"/>
+
+    <!--自定义redis工具类,在需要缓存的地方注入此类  -->
+    <!--<bean id="redisrCacheManager" class="Test.RedisCacheManager">-->
+        <!--<property name="redisTemplate" ref="redisTemplate" />-->
+    <!--</bean>-->
+
+    <!--支持注解,这里需要精确对应到自己的包，否则会出错-->
+    <context:component-scan base-package="org.jivesoftware"/>
+    <context:component-scan base-package="Test"/>
+    <context:annotation-config />
+    <mvc:annotation-driven />
+
+</beans>

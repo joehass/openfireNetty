@@ -1,7 +1,5 @@
 package org.jivesoftware.openfire.Connection.redis;
 
-import com.sun.org.apache.bcel.internal.generic.IF_ACMPEQ;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;

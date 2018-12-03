@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+    <beans xmlns="http://www.springframework.org/schema/beans"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xmlns:tx="http://www.springframework.org/schema/tx"
+           xmlns:aop="http://www.springframework.org/schema/aop"
+           xmlns:context="http://www.springframework.org/schema/context"
+           xsi:schemaLocation="
+      http://www.springframework.org/schema/beans
+      http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+      http://www.springframework.org/schema/tx
+      http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
+      http://www.springframework.org/schema/context
+      http://www.springframework.org/schema/context/spring-context-3.0.xsd
+http://www.springframework.org/schema/aop
+http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <!-- 加载数据库连接的资源文件 -->
+    <context:property-placeholder location="classpath*:jdbc.properties" ignore-unresolvable="true"/>
+
+    <!-- 配置数据源   dbcp数据库连接池 -->
+    <bean id="dataSource" class="org.apache.commons.dbcp2.BasicDataSource" destroy-method="close">
+        <!--<property name="driver" value="${DriverClasses}"/>-->
+        <property name="driverClassName" value="${DriverClasses}"/>
+        <property name="url" value="${ecology.url}"/>
+        <property name="username" value="${ecology.user}"/>
+        <property name="password" value="${ecology.password}"/>
+    </bean>
+
+    <!-- 配置sqlSessionFactory -->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <!-- 数据库连接池 -->
+        <property name="dataSource" ref="dataSource"/>
+        <!-- 加载Mybatis全局配置文件 -->
+        <property name="configLocation" value="/mybatis/SqlMapConfig.xml"/>
+        <!--制定mapper文件位置，当不指定时mapper映射文件默认与接口在一个包下-->
+        <property name="mapperLocations" value="classpath*:org/jivesoftware/mapper/openfire/xml/*.xml"/>
+    </bean>
+
+    <!-- 配置mapper扫描器 -->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <!-- 扫描包路径，如果需要扫描多个包中间用半角逗号隔开 -->
+        <!-- dao层接口包 -->
+        <property name="basePackage" value="org.jivesoftware.mapper.openfire.mapper"></property>
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
+    </bean>
+
+    <!--5 声明式事务管理 -->
+    <!--定义事物管理器，由spring管理事务 -->
+    <!--<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">-->
+        <!--<property name="dataSource" ref="dataSource"></property>-->
+    <!--</bean>-->
+    <!--支持注解驱动的事务管理，指定事务管理器 -->
+    <!--<tx:annotation-driven transaction-manager="transactionManager" />-->
+
+    <!-- 配置spring的PlatformTransactionManager，名字为默认值 -->
+    <!--<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">-->
+        <!--<property name="dataSource" ref="dataSource" />-->
+    <!--</bean>-->
+
+    <!-- 开启事务控制的注解支持 -->
+    <!--<tx:annotation-driven transaction-manager="transactionManager"	proxy-target-class="true" />-->
+
+    <!--6 容器自动扫描IOC组件  -->
+    <!--<context:component-scan base-package="com.zhangguo.bookstore"></context:component-scan>-->
+
+    <!-- 事务控制  对MyBatis操作数据库  spring使用JDBC事务控制类 -->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <!-- 配置数据源 -->
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <!-- 通知 -->
+    <tx:advice id="txAdvice" transaction-manager="transactionManager">
+        <tx:attributes>
+            <!-- 传播行为 -->
+            <tx:method name="save*" propagation="REQUIRED"/>
+            <tx:method name="insert*" propagation="REQUIRED"/>
+            <tx:method name="update*" propagation="REQUIRED"/>
+            <tx:method name="delete*" propagation="REQUIRED"/>
+            <tx:method name="find*" propagation="SUPPORTS" read-only="true"/>
+            <tx:method name="select*" propagation="SUPPORTS" read-only="true"/>
+        </tx:attributes>
+    </tx:advice>
+
+    <!--7 aspectj支持自动代理实现AOP功能 -->
+    <aop:aspectj-autoproxy proxy-target-class="true"></aop:aspectj-autoproxy>
+
+    <!--&lt;!&ndash;配置注解&ndash;&gt;-->
+    <!--<context:component-scan base-package="org.jivesoftware"/>-->
+</beans>
